@@ -623,7 +623,7 @@ const DATA = {"models": [{"key": "frontier", "label": "GPT-5.6-sol", "sub": "ren
   const mail = "mailto:"+C.links.email;
   for(const id of ["mailto","cta","heroCta","navCta"]) if($(id)) $(id).href = mail;
   $("footContact").innerHTML = `<a href="${mail}">${C.links.email}</a>`;
-  $("ctaLabel").innerHTML = `Talk to me at <span class="lower">${C.links.email}</span>`;
+  if($("ctaLabel")) $("ctaLabel").innerHTML = `Talk to me at <span class="lower">${C.links.email}</span>`;
   if(C.links.linkedin){ $("liWrap").hidden=false; const l=$("liLink"); l.hidden=false; l.href=C.links.linkedin; }
   $("stamp").textContent = "Built August 2026.";
 })();
