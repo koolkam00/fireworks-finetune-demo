@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Specialized intelligence, demonstrated — Andrew Kam × Fireworks</title>
+<style>
+  :root{
+    color-scheme: light;
+    --surface-1:#fcfcfb; --page:#f9f9f7;
+    --ink-1:#0b0b0b; --ink-2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --baseline:#c3c2b7; --ring:rgba(11,11,11,.10);
+    --s1:#2a78d6; --s2:#eb6834; --good:#006300; --bad:#d03b3b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      color-scheme: dark;
+      --surface-1:#1a1a19; --page:#0d0d0d;
+      --ink-1:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --baseline:#383835; --ring:rgba(255,255,255,.10);
+      --s1:#3987e5; --s2:#d95926; --good:#0ca30c; --bad:#e66767;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);color:var(--ink-1);
+       font:15.5px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+  .wrap{max-width:980px;margin:0 auto;padding:44px 20px 80px}
+  h1{font-size:36px;line-height:1.12;letter-spacing:-.015em;margin:0 0 16px;max-width:26ch}
+  h2{font-size:22px;letter-spacing:-.01em;margin:56px 0 10px}
+  h3{font-size:15px;margin:18px 0 6px}
+  p{max-width:74ch;color:var(--ink-2)}
+  a{color:var(--s1)}
+  .kicker{font-size:12.5px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--s1);margin-bottom:10px}
+  .byline{display:flex;gap:14px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:13.5px;margin-top:16px}
+  .card{background:var(--surface-1);border:1px solid var(--ring);border-radius:14px;padding:20px 22px;margin:18px 0}
+  .tldr{font-size:17px;color:var(--ink-1);max-width:70ch;margin:0 0 10px}
+  ul.tldr-list{margin:0;padding-left:20px;max-width:76ch}
+  ul.tldr-list li{margin:7px 0;color:var(--ink-2)}
+  ul.tldr-list li::marker{color:var(--s1)}
+  /* scoreboard */
+  table.score{border-collapse:collapse;width:100%;font-size:14.5px}
+  .score th,.score td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--grid);font-variant-numeric:tabular-nums}
+  .score th:first-child,.score td:first-child{text-align:left}
+  .score thead th{color:var(--muted);font-size:12.5px;font-weight:600}
+  .score tr.ours{background:rgba(42,120,214,.07)}
+  .score td.acc{font-size:18px;font-weight:650}
+  .score .sub{display:block;font-size:12px;color:var(--muted);font-weight:400}
+  .tag{display:inline-block;font-size:10.5px;font-weight:650;letter-spacing:.05em;border:1px solid var(--baseline);
+       border-radius:999px;padding:1px 8px;color:var(--ink-2);margin-left:8px;vertical-align:1px}
+  .fieldbars{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px 26px;font-size:12.5px}
+  .fb{display:grid;grid-template-columns:1fr auto;gap:6px;color:var(--ink-2)}
+  .fb .bar{grid-column:1/-1;height:6px;border-radius:3px;background:var(--grid);position:relative;overflow:hidden}
+  .fb .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--s1);border-radius:3px}
+  .fb .bar i.f{background:var(--s2)}
+  .note{font-size:13px;color:var(--muted);max-width:78ch}
+  /* chips (shared) */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .chip{border:1px solid var(--baseline);background:var(--surface-1);color:var(--ink-2);
+    border-radius:999px;padding:6px 13px;font-size:12.5px;cursor:pointer}
+  .chip[aria-pressed="true"]{border-color:var(--s1);color:var(--ink-1);box-shadow:inset 0 0 0 1px var(--s1)}
+  /* calculator */
+  .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px 22px}
+  label.ctl{display:block;font-size:12.5px;color:var(--ink-2)}
+  label.ctl b{display:block;color:var(--ink-1);font-size:13px;margin-bottom:6px;font-weight:600}
+  input[type=range]{width:100%;accent-color:var(--s1)}
+  input[type=number],select{width:100%;padding:7px 9px;border:1px solid var(--baseline);
+    border-radius:8px;background:var(--surface-1);color:var(--ink-1);font:inherit;font-size:13.5px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0}
+  .tile{background:var(--surface-1);border:1px solid var(--ring);border-radius:12px;padding:14px 16px}
+  .tile .k{font-size:12px;color:var(--muted);margin-bottom:4px}
+  .tile .v{font-size:24px;font-weight:650;letter-spacing:-.01em}
+  .tile .d{font-size:12px;color:var(--ink-2);margin-top:3px}
+  .tile .v.save{color:var(--good)}
+  .legend{display:flex;gap:18px;align-items:center;font-size:12.5px;color:var(--ink-2);margin:2px 0 8px}
+  .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  #tooltip{position:fixed;pointer-events:none;background:var(--surface-1);border:1px solid var(--ring);
+    box-shadow:0 4px 14px rgba(0,0,0,.12);border-radius:8px;padding:8px 11px;font-size:12.5px;display:none;z-index:9}
+  #tooltip .t{color:var(--muted);margin-bottom:3px}
+  .tbl-toggle{background:none;border:none;color:var(--ink-2);text-decoration:underline;cursor:pointer;font:inherit;font-size:12.5px;padding:0}
+  svg text{font:12px system-ui,-apple-system,"Segoe UI",sans-serif;fill:var(--muted)}
+  svg .dl{font-size:12.5px;font-weight:600}
+  svg .be-label{font-size:12px;font-weight:600;fill:var(--ink-1)}
+  /* story steps */
+  .steps{display:grid;gap:12px}
+  .step{background:var(--surface-1);border:1px solid var(--ring);border-radius:12px;padding:16px 18px;display:grid;
+        grid-template-columns:34px 1fr auto;gap:14px;align-items:start}
+  .step .num{width:28px;height:28px;border-radius:999px;background:rgba(42,120,214,.1);color:var(--s1);
+             display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .step h3{margin:2px 0 4px}
+  .step p{font-size:13.5px;margin:0}
+  .step .meta{font-size:12px;color:var(--muted);white-space:nowrap;padding-top:6px}
+  /* sample explorer + generic tables */
+  table.cmp{border-collapse:collapse;width:100%;font-size:13px}
+  .cmp th,.cmp td{padding:8px 10px;border-bottom:1px solid var(--grid);text-align:left;vertical-align:top}
+  .cmp thead th{color:var(--muted);font-weight:600;font-size:12px}
+  .cmp td.v{font-variant-numeric:tabular-nums;max-width:200px;overflow-wrap:break-word}
+  .ok{color:var(--good);font-weight:700}
+  .no{color:var(--bad);font-weight:700}
+  .lat{color:var(--muted);font-size:11.5px;font-weight:400}
+  table td,table th{}
+  .devex{display:grid;gap:14px}
+  .devex .card{margin:0}
+  .devex h3{margin:0 0 6px;font-size:15.5px}
+  .devex p{font-size:14px;margin:6px 0}
+  .devex .fix{color:var(--ink-1);font-size:13.5px;font-weight:550}
+  .cta{display:inline-block;background:var(--s1);color:#fff;text-decoration:none;font-weight:650;
+       border-radius:10px;padding:11px 18px;font-size:15px}
+  .src{font-size:11.5px;color:var(--muted)}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--grid);color:var(--muted);font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ TL;DR ============ -->
+  <div class="kicker">Built on Fireworks · an application for the <span id="roleName"></span> role</div>
+  <h1>Specialized intelligence, demonstrated</h1>
+  <p class="tldr" id="tldrLine"></p>
+  <ul class="tldr-list" id="tldrList"></ul>
+  <div class="byline"><span><b>Andrew Kam</b></span><span>·</span><a id="mailto" href="#">andrew.kam00@gmail.com</a>
+    <span id="liWrap" hidden>·</span><a id="liLink" href="#" hidden>LinkedIn</a></div>
+
+  <div class="card">
+    <table class="score" id="scoreTable"></table>
+    <div class="note" id="scoreNote" style="margin-top:12px"></div>
+    <div class="fieldbars" id="fieldbars"></div>
+  </div>
+
+  <!-- ============ CALCULATOR ============ -->
+  <h2 id="calc">Rent vs.&nbsp;own: when does specialization pay for itself?</h2>
+  <p>Every number in the featured preset is measured from the experiment above, not estimated.
+  Set your own workload and watch the curves cross.</p>
+
+  <div class="chips" id="calcPresets" role="group" aria-label="Workload presets"></div>
+  <div class="card">
+    <div class="controls">
+      <label class="ctl"><b>Requests per month: <span id="volLbl"></span></b>
+        <input type="range" id="vol" min="0" max="1000" value="500" aria-label="Requests per month"></label>
+      <label class="ctl"><b>Input tokens / request</b>
+        <input type="number" id="tin" value="8750" min="1" step="100"></label>
+      <label class="ctl"><b>Output tokens / request</b>
+        <input type="number" id="tout" value="100" min="1" step="10"></label>
+      <label class="ctl"><b>Frontier model (rented)</b>
+        <select id="frontierSel"></select></label>
+      <label class="ctl"><b>Owned model serving</b>
+        <select id="ownedSel"></select></label>
+      <label class="ctl"><b>One-time specialization cost ($)</b>
+        <input type="number" id="upfront" value="30" min="0" step="25"></label>
+    </div>
+  </div>
+  <div class="tiles">
+    <div class="tile"><div class="k">Renting — monthly</div><div class="v" id="tRent"></div><div class="d" id="tRentD"></div></div>
+    <div class="tile"><div class="k">Owning — monthly</div><div class="v" id="tOwn"></div><div class="d" id="tOwnD"></div></div>
+    <div class="tile"><div class="k">Breakeven</div><div class="v" id="tBE"></div><div class="d" id="tBED"></div></div>
+    <div class="tile"><div class="k">Saved in year one</div><div class="v save" id="tSave"></div><div class="d" id="tSaveD"></div></div>
+  </div>
+  <div class="card">
+    <div class="legend">
+      <span><span class="sw" style="background:var(--s2)"></span>Renting (frontier API)</span>
+      <span><span class="sw" style="background:var(--s1)"></span>Owning (tuned open model)</span>
+      <span style="margin-left:auto"><button class="tbl-toggle" id="tblBtn" aria-expanded="false">View as table</button></span>
+    </div>
+    <div style="position:relative"><svg id="chart" width="100%" height="360" role="img"
+      aria-label="Cumulative cost over twelve months for renting a frontier model versus owning a tuned open model"></svg></div>
+    <div id="tblWrap" hidden style="margin-top:10px;overflow-x:auto"></div>
+    <div class="note" id="calcFoot" style="margin-top:10px"></div>
+  </div>
+
+  <!-- ============ WHAT I DID ============ -->
+  <h2>What I actually did — one day, ~$120, start to finish</h2>
+  <div class="steps" id="steps"></div>
+
+  <h2>See it read a real agreement</h2>
+  <p>Every document below is from the held-out test set — the models never saw them in training.
+  Pick one; every cell is a recorded model output from the eval run, checked against the adjudicated answer.</p>
+  <div class="chips" id="sampleChips"></div>
+  <div class="card" style="overflow-x:auto"><table class="cmp" id="cmpTable"></table>
+  <div class="src" id="srcLink"></div></div>
+
+  <h2>Method — the honest version</h2>
+  <p id="method"></p>
+
+  <h2>Four DevEx notes from onboarding as a stranger</h2>
+  <p class="note">Logged signup-to-served-model in one day, as a brand-new customer. Each with the fix I'd ship.</p>
+  <div class="devex" id="devex"></div>
+
+  <h2 id="gtmHead"></h2>
+  <p id="gtmBody"></p>
+  <p class="note" id="gtmTargets"></p>
+
+  <h2>Why this page exists</h2>
+  <p id="about"></p>
+  <p style="margin-top:20px"><a class="cta" id="cta" href="#">Talk to me — andrew.kam00@gmail.com</a></p>
+
+  <footer>Dataset: executed credit agreements filed with the SEC (EDGAR full-text search). Gold labels: frontier-drafted,
+  independently audited by a second model family, contested calls human-adjudicated. Eval: field-level scoring, one command
+  to reproduce. Pricing: public list rates, August 2026. No affiliation with Fireworks AI — this is an independent
+  application project. <span id="stamp"></span></footer>
+</div>
+<div id="tooltip" role="status"></div>
+
+<script>
+"use strict";
+const DATA = {"models": [{"key": "frontier", "label": "GPT-5.6-sol", "sub": "rented frontier API", "tag": "REFERENCE", "ours": false, "acc": 0.9742, "cost": 52.91, "lat": 6.01, "fields": {"borrower_name": 0.9796, "administrative_agent": 1.0, "agreement_date": 0.9592, "total_facility_size_usd": 0.9388, "facility_types": 0.9568, "maturity_date": 1.0, "benchmark_rate": 1.0, "governing_law": 0.9592}, "n": 49}, {"key": "base8b", "label": "Llama-3.1-8B \u2014 base", "sub": "open weights, untouched", "tag": "", "ours": false, "acc": 0.6687, "cost": 1.78, "lat": 3.02, "fields": {"borrower_name": 0.7959, "administrative_agent": 0.8571, "agreement_date": 0.6735, "total_facility_size_usd": 0.449, "facility_types": 0.5127, "maturity_date": 0.5918, "benchmark_rate": 0.6735, "governing_law": 0.7959}, "n": 49}, {"key": "tuned8b", "label": "Llama-3.1-8B \u2014 tuned", "sub": "$2 LoRA on Fireworks", "tag": "OURS", "ours": true, "acc": 0.9031, "cost": 1.77, "lat": 3.37, "fields": {"borrower_name": 0.9388, "administrative_agent": 0.9796, "agreement_date": 0.9592, "total_facility_size_usd": 0.6327, "facility_types": 0.8985, "maturity_date": 0.898, "benchmark_rate": 0.9388, "governing_law": 0.9796}, "n": 49}, {"key": "qwen8b_base", "label": "Qwen3-8B \u2014 base", "sub": "open weights, untouched", "tag": "", "ours": false, "acc": 0.8019, "cost": 1.88, "lat": 8.91, "fields": {"borrower_name": 0.9388, "administrative_agent": 0.9388, "agreement_date": 0.9796, "total_facility_size_usd": 0.6327, "facility_types": 0.5783, "maturity_date": 0.6531, "benchmark_rate": 0.7347, "governing_law": 0.9592}, "n": 49}, {"key": "qwen8b", "label": "Qwen3-8B \u2014 tuned", "sub": "same recipe, newer family", "tag": "EXPERIMENT", "ours": false, "acc": 0.83, "cost": 1.86, "lat": 5.3, "fields": {"borrower_name": 0.9388, "administrative_agent": 0.9388, "agreement_date": 0.9796, "total_facility_size_usd": 0.7143, "facility_types": 0.6401, "maturity_date": 0.6735, "benchmark_rate": 0.7755, "governing_law": 0.9796}, "n": 49}], "families": [{"label": "Llama-3.1-8B", "sub": "dense 8B \u00b7 2024 \u00b7 $2 LoRA", "ours": true, "base": {"acc": 0.6687, "cost": 1.78, "lat": 3.02}, "tuned": {"acc": 0.9031, "cost": 1.77, "lat": 3.37}}, {"label": "Qwen3-8B", "sub": "dense 8B \u00b7 2025 \u00b7 same recipe", "ours": false, "base": {"acc": 0.8019, "cost": 1.88, "lat": 8.91}, "tuned": {"acc": 0.83, "cost": 1.86, "lat": 5.3}}], "samples": [{"id": "000119312524125057_1487712", "company": "AIR LEASE CORP", "date": "2024-04-30", "url": "https://www.sec.gov/Archives/edgar/data/1487712/000119312524125057/d825625dex101.htm", "gold": {"borrower_name": "AIR LEASE CORPORATION", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "2024-04-29", "total_facility_size_usd": 7807500000, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2028-05-05", "benchmark_rate": "SOFR", "governing_law": "New York"}, "models": [{"name": "GPT-5.6-sol", "pred": {"borrower_name": "AIR LEASE CORPORATION", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "2024-04-29", "total_facility_size_usd": 7807500000, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2028-05-05", "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 5.97}, {"name": "Base 8B", "pred": null, "lat": 10.64}, {"name": "Tuned 8B", "pred": {"borrower_name": "AIR LEASE CORPORATION", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "2024-04-29", "total_facility_size_usd": null, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2028-05-05", "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 3.25}]}, {"id": "000119312525262515_732717", "company": "AT&T INC.", "date": "2025-11-03", "url": "https://www.sec.gov/Archives/edgar/data/732717/000119312525262515/d935272dex101.htm", "gold": {"borrower_name": "AT&T INC.", "administrative_agent": "CITIBANK, N.A.", "agreement_date": "2025-11-03", "total_facility_size_usd": 12000000000, "facility_types": ["revolving"], "maturity_date": "2030-11-03", "benchmark_rate": "SOFR", "governing_law": "New York"}, "models": [{"name": "GPT-5.6-sol", "pred": {"borrower_name": "AT&T INC.", "administrative_agent": "CITIBANK, N.A.", "agreement_date": "2025-11-03", "total_facility_size_usd": 12000000000, "facility_types": ["revolving"], "maturity_date": "2030-11-03", "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 6.98}, {"name": "Base 8B", "pred": null, "lat": 10.27}, {"name": "Tuned 8B", "pred": {"borrower_name": "AT&T INC.", "administrative_agent": "CITIBANK, N.A.", "agreement_date": "2025-11-03", "total_facility_size_usd": 12000000000, "facility_types": ["revolving"], "maturity_date": "2030-11-03", "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 3.0}]}, {"id": "000114036125035307_10795", "company": "BECTON DICKINSON & CO", "date": "2025-09-18", "url": "https://www.sec.gov/Archives/edgar/data/10795/000114036125035307/ef20055689_ex10-1.htm", "gold": {"borrower_name": "BECTON, DICKINSON AND COMPANY", "administrative_agent": "CITIBANK, N.A.", "agreement_date": "2025-09-16", "total_facility_size_usd": 2750000000, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2030-09-16", "benchmark_rate": "SOFR", "governing_law": "New York"}, "models": [{"name": "GPT-5.6-sol", "pred": {"borrower_name": "BECTON, DICKINSON AND COMPANY", "administrative_agent": "CITIBANK, N.A.", "agreement_date": "2025-09-16", "total_facility_size_usd": 2750000000, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2030-09-16", "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 3.25}, {"name": "Base 8B", "pred": {"borrower_name": "Becton, Dickinson and Company", "administrative_agent": "Citibank, N.A.", "agreement_date": "September 16, 2025", "total_facility_size_usd": null, "facility_types": ["revolving", "letter_of_credit"], "maturity_date": null, "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 3.05}, {"name": "Tuned 8B", "pred": {"borrower_name": "BECTON, DICKINSON AND COMPANY, Becton Dickinson Euro Finance S.\u00e0 r.l.", "administrative_agent": "CITIBANK, N.A.", "agreement_date": "2025-09-16", "total_facility_size_usd": 2750000000, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": null, "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 3.5}]}, {"id": "000114036121014114_1383312", "company": "BROADRIDGE FINANCIAL SOLUTIONS, INC.", "date": "2021-04-23", "url": "https://www.sec.gov/Archives/edgar/data/1383312/000114036121014114/brhc10023561_ex10-1.htm", "gold": {"borrower_name": "BROADRIDGE FINANCIAL SOLUTIONS, INC.", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "2021-04-23", "total_facility_size_usd": 1500000000, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2026-04-23", "benchmark_rate": "LIBOR", "governing_law": "New York"}, "models": [{"name": "GPT-5.6-sol", "pred": {"borrower_name": "BROADRIDGE FINANCIAL SOLUTIONS, INC.", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "2021-04-23", "total_facility_size_usd": 1500000000, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2026-04-23", "benchmark_rate": "LIBOR", "governing_law": null}, "lat": 7.89}, {"name": "Base 8B", "pred": {"borrower_name": "BROADRIDGE FINANCIAL SOLUTIONS, INC.", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "April 23, 2021", "total_facility_size_usd": null, "facility_types": ["revolving", "swingline", "letter_of_credit"], "maturity_date": "April 23, 2026", "benchmark_rate": "SONIA", "governing_law": "State of New York"}, "lat": 3.15}, {"name": "Tuned 8B", "pred": {"borrower_name": "BROADRIDGE FINANCIAL SOLUTIONS, INC.", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "2021-04-23", "total_facility_size_usd": 1500000000, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2026-04-23", "benchmark_rate": "LIBOR", "governing_law": "New York"}, "lat": 3.56}]}, {"id": "000162828026043937_785557", "company": "DLH Holdings Corp.", "date": "2026-06-17", "url": "https://www.sec.gov/Archives/edgar/data/785557/000162828026043937/form-secondamendmenttocred.htm", "gold": {"borrower_name": "DLH HOLDINGS CORP.", "administrative_agent": "First National Bank of Pennsylvania", "agreement_date": "2026-06-11", "total_facility_size_usd": 240000000, "facility_types": ["revolving", "term_a", "letter_of_credit", "swingline"], "maturity_date": "2027-12-08", "benchmark_rate": "SOFR", "governing_law": "Maryland"}, "models": [{"name": "GPT-5.6-sol", "pred": {"borrower_name": "DLH HOLDINGS CORP.", "administrative_agent": "First National Bank of Pennsylvania", "agreement_date": "2026-06-11", "total_facility_size_usd": 240000000, "facility_types": ["revolving", "term_a", "letter_of_credit", "swingline"], "maturity_date": "2027-12-08", "benchmark_rate": "SOFR", "governing_law": "Maryland"}, "lat": 20.44}, {"name": "Base 8B", "pred": {"borrower_name": "DLH Holdings Corp., DLH Solutions, Inc., Danya International, LLC, Social & Scientific Systems, Inc., Irving Burton Associates, LLC, and DLH, LLC", "administrative_agent": "First National Bank of Pennsylvania", "agreement_date": "June 11, 2026", "total_facility_size_usd": null, "facility_types": ["revolving", "term_a", "term_b"], "maturity_date": "December 8, 2027", "benchmark_rate": "SOFR", "governing_law": "Maryland"}, "lat": 2.59}, {"name": "Tuned 8B", "pred": {"borrower_name": "DLH HOLDINGS CORP.", "administrative_agent": "FIRST NATIONAL BANK OF PENNSYLVANIA", "agreement_date": "2026-06-11", "total_facility_size_usd": 340000000, "facility_types": ["revolving", "term_a", "letter_of_credit", "swingline"], "maturity_date": null, "benchmark_rate": "SOFR", "governing_law": "Maryland"}, "lat": 2.07}]}, {"id": "000119312521071488_918646", "company": "EAGLE MATERIALS INC", "date": "2021-03-05", "url": "https://www.sec.gov/Archives/edgar/data/918646/000119312521071488/d29046dex101.htm", "gold": {"borrower_name": "Eagle Materials Inc.", "administrative_agent": "JPMorgan Chase Bank, N.A.", "agreement_date": "2021-03-04", "total_facility_size_usd": 500000000, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2023-08-02", "benchmark_rate": "LIBOR", "governing_law": "New York"}, "models": [{"name": "GPT-5.6-sol", "pred": {"borrower_name": "Eagle Materials Inc.", "administrative_agent": "JPMorgan Chase Bank, N.A.", "agreement_date": "2021-03-04", "total_facility_size_usd": null, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2023-08-02", "benchmark_rate": "LIBOR", "governing_law": "New York"}, "lat": 8.44}, {"name": "Base 8B", "pred": {"borrower_name": "Eagle Materials Inc.", "administrative_agent": "JPMorgan Chase Bank, N.A.", "agreement_date": "March 4, 2021", "total_facility_size_usd": null, "facility_types": ["revolving"], "maturity_date": "August 2, 2021", "benchmark_rate": null, "governing_law": "New York"}, "lat": 2.62}, {"name": "Tuned 8B", "pred": {"borrower_name": "Eagle Materials Inc.", "administrative_agent": "JPMorgan Chase Bank, N.A.", "agreement_date": "2021-03-04", "total_facility_size_usd": null, "facility_types": ["revolving", "letter_of_credit", "swingline"], "maturity_date": "2023-08-02", "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 3.29}]}, {"id": "000119312526260817_814547", "company": "FAIR ISAAC CORP", "date": "2026-06-08", "url": "https://www.sec.gov/Archives/edgar/data/814547/000119312526260817/d140061dex101.htm", "gold": {"borrower_name": "FAIR ISAAC CORPORATION", "administrative_agent": "WELLS FARGO BANK, NATIONAL ASSOCIATION", "agreement_date": "2026-06-05", "total_facility_size_usd": 2500000000, "facility_types": ["revolving", "term_a", "swingline"], "maturity_date": "2030-05-13", "benchmark_rate": "SOFR", "governing_law": "New York"}, "models": [{"name": "GPT-5.6-sol", "pred": {"borrower_name": "FAIR ISAAC CORPORATION", "administrative_agent": "WELLS FARGO BANK, NATIONAL ASSOCIATION", "agreement_date": "2026-06-05", "total_facility_size_usd": 2500000000, "facility_types": ["revolving", "term_a", "letter_of_credit", "swingline"], "maturity_date": "2030-05-13", "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 8.33}, {"name": "Base 8B", "pred": {"borrower_name": "FAIR ISAAC CORPORATION", "administrative_agent": "WELLS FARGO BANK, NATIONAL ASSOCIATION", "agreement_date": "2025-05-13", "total_facility_size_usd": null, "facility_types": ["revolving", "term_a", "term_b"], "maturity_date": "2030-05-13", "benchmark_rate": "SOFR", "governing_law": "NEW YORK"}, "lat": 2.86}, {"name": "Tuned 8B", "pred": {"borrower_name": "FAIR ISAAC CORPORATION", "administrative_agent": "WELLS FARGO BANK, NATIONAL ASSOCIATION", "agreement_date": "2026-06-05", "total_facility_size_usd": 2500000000, "facility_types": ["revolving", "term_a", "letter_of_credit", "swingline"], "maturity_date": null, "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 3.37}]}, {"id": "000119312522096284_1467858", "company": "General Motors Co", "date": "2022-04-05", "url": "https://www.sec.gov/Archives/edgar/data/1467858/000119312522096284/d345200dex101.htm", "gold": {"borrower_name": "GENERAL MOTORS COMPANY", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "2022-04-05", "total_facility_size_usd": 2000000000, "facility_types": ["revolving"], "maturity_date": "2023-04-04", "benchmark_rate": "SOFR", "governing_law": "New York"}, "models": [{"name": "GPT-5.6-sol", "pred": {"borrower_name": "GENERAL MOTORS COMPANY", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "2022-04-05", "total_facility_size_usd": 2000000000, "facility_types": ["revolving"], "maturity_date": "2023-04-04", "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 5.67}, {"name": "Base 8B", "pred": {"borrower_name": "GENERAL MOTORS COMPANY", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "2022-04-05", "total_facility_size_usd": null, "facility_types": ["revolving"], "maturity_date": "2023-04-04", "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 3.11}, {"name": "Tuned 8B", "pred": {"borrower_name": "GENERAL MOTORS COMPANY", "administrative_agent": "JPMORGAN CHASE BANK, N.A.", "agreement_date": "2022-04-05", "total_facility_size_usd": 2000000000, "facility_types": ["revolving", "term_a", "letter_of_credit", "swingline"], "maturity_date": "2023-04-04", "benchmark_rate": "SOFR", "governing_law": "New York"}, "lat": 3.36}]}], "content": {"devex_notes": [{"title": "The serverless cliff after fine-tuning", "body": "Fine-tuning an 8B costs a few dollars, but serving it requires a dedicated GPU deployment (H100-class) \u2014 the 8B base models aren't on serverless anymore, and LoRA addons don't deploy there either. For an indie developer or a team running a pilot, that's a jump from cents to $8/hr before the first production token \u2014 a few hundred megabytes of adapter with no way to pay per-token to use it. That's exactly the gap where a team that just proved specialization works decides whether to standardize on the platform.", "fix": "Packaging fix: a 'pilot tier' \u2014 serverless LoRA serving for tuned models on bases already in the serverless fleet, even rate-limited. It converts exactly the customers who just proved specialization works."}, {"title": "REST API shapes disagree with the docs", "body": "The fine-tuning docs show a wrapped request body ({\"supervisedFineTuningJob\": {...}}), but the API only accepts the flat object \u2014 the wrapper returns a proto 'unknown field' error. Deployment creation has the same issue, plus acceleratorType is required but no error names the valid enum values. Worst one: PATCHing enableAddons onto a live deployment returns 200 and records the change in annotations \u2014 but the field silently stays false, so LoRA addon loads keep failing with 'addons disabled'. Each of these cost a guess-and-retry loop.", "fix": "Fix: error messages that enumerate accepted fields/values; REST examples generated from the protos so they can't drift; PATCH that either applies or errors \u2014 never a silent 200."}, {"title": "New accounts hit silent quota walls", "body": "A brand-new account has an A100 quota of zero, discovered only via a 429 at deployment time; H100 works but is the priciest hourly option. Nothing at signup or in the console sets that expectation. Quota accounting also lags reality: a single-GPU deployment I deleted stayed in DELETING for 40+ minutes, and its H100 kept counting against my quota the whole time, blocking the next deployment.", "fix": "Fix: show per-accelerator quotas at signup and in every 429 body with a one-click quota request \u2014 and release quota when a deployment stops serving, not when its deletion finishes garbage-collecting."}], "devex_note_4": {"title": "Four signals about tunability, and they disagree", "body": "For one brand-new model (Muse Glimmer 30B, nine days old), the catalog metadata said supportsLora: true, the docs were silent, the job-creation endpoint's first validation gate accepted it (I probed with a deliberately fake dataset name \u2014 it failed on 'dataset not found', i.e. past the tunability check), and then the real submission was refused with 'model does not support tuning' by a deeper gate. Metadata, docs, gate one, and gate two are four sources of truth that don't agree.", "fix": "Fix: one canonical tunability bit surfaced everywhere from the same source \u2014 and a dry-run flag on job creation, so developers can validate a config for $0 without discovering gates in sequence."}, "tldr": {"role": "Strategic Projects Lead", "line1": "I applied by doing the job first. In one day, for about $50 of compute, I built Fireworks' own pitch in miniature:", "bullets": ["Pulled 289 executed credit agreements from SEC EDGAR and built a labeled extraction benchmark (8 fields, human-adjudicated gold set)", "LoRA-tuned two open-model families on Fireworks \u2014 Llama-3.1-8B and Qwen3-8B \u2014 and benchmarked base vs. tuned vs. GPT-5.6-sol, all on the same 49 held-out documents", "Headline result: a $2 fine-tune took Llama-8B from 67% to 90% field accuracy at 1/30th the frontier's cost and half its latency \u2014 while the identical recipe moved Qwen only +2.8 points: tuning gains are family-dependent, and base rank doesn't predict tuned rank", "Shipped the rent-vs-own breakeven calculator below, four DevEx findings with proposed fixes, and the private-markets GTM wedge I'd run"]}, "story_steps": [{"n": "1", "t": "Built the benchmark", "d": "289 executed credit agreements pulled from SEC EDGAR (2019\u20132026, one per company, amendments filtered out), trimmed to definition-bearing excerpts. My domain: I can personally verify every answer.", "meta": "~2 hours \u00b7 $0"}, {"n": "2", "t": "Made the answer key", "d": "GPT-5.6-sol drafted labels for all 8 fields; 238 documents became training demonstrations, 50 were locked away as the exam. The exam key was then independently audited field-by-field by a second model family and I adjudicated every contested call \u2014 my rulings overturned the frontier's drafts on 3 of 5.", "meta": "~1 hour \u00b7 $15"}, {"n": "3", "t": "Fine-tuned on Fireworks", "d": "Supervised LoRA (rank 16, 2 epochs) on 238 demonstrations, across two families. Llama-3.1-8B: 35 minutes, ~$2, +23.4 points. Qwen3-8B, identical recipe: +2.8 \u2014 despite starting 13 points ahead of Llama off the shelf. Tuning gains are family-dependent, and base rank doesn't predict tuned rank; you pick bases empirically, which the platform makes a same-day question.", "meta": "~1 hour of jobs \u00b7 ~$2 each"}, {"n": "4", "t": "Graded everything identically", "d": "One eval harness, same prompt, same excerpts, same field-appropriate scoring for every model \u2014 fuzzy names, normalized dates and amounts, set-F1 on facility types, null-discipline enforced. Cost and latency recorded per call.", "meta": "~$10 of GPU eval time"}, {"n": "5", "t": "Priced the decision", "d": "The calculator above turns the measured numbers into the buy-vs-rent breakeven any workload can check. The pattern generalizes: this is the sales tool for every specialized-intelligence conversation.", "meta": "measured, not modeled"}], "gtm_wedge": {"headline": "The wedge I'd run: private markets, one document type at a time", "body": "Harvey proved legal AI on Fireworks. The vertical next door is private markets \u2014 funds, fund admins, and private-credit shops that read credit agreements, LPAs, and side letters all day, at $300+/hr review rates, under confidentiality constraints that make owning the model (not renting a frontier API) the natural end state. This demo is that pitch in miniature: one document type, one afternoon of tuning, frontier-class extraction at a fraction of the cost. The motion: land with fund admins and credit shops on document ops (extraction, covenant tracking, DDQ), expand to the funds themselves.", "targets": "Representative targets: fund administrators (Citco, SS&C, Alter Domus, Gen II), private-credit managers (Golub, Ares, Blue Owl, HPS), LP-side ops teams, and the CLO trustees/agents that touch every credit agreement at closing.", "note_placeholder": true}, "about": "I'm Andrew Kam \u2014 finance background (PE/VC-fluent), NYC, builder. I made this in one day to apply for the Strategic Projects Lead role: dataset from SEC EDGAR, supervised fine-tune on Fireworks, honest eval, and the cost model to go with it.", "links": {"calculator": "calculator.html", "email": "andrew.kam00@gmail.com", "linkedin": ""}}, "fields": ["borrower_name", "administrative_agent", "agreement_date", "total_facility_size_usd", "facility_types", "maturity_date", "benchmark_rate", "governing_law"], "n_test": 49, "frontier": {"acc": 0.9742, "cost": 52.91, "lat": 6.01}, "bars": {"frontier": {"borrower_name": 0.9796, "administrative_agent": 1.0, "agreement_date": 0.9592, "total_facility_size_usd": 0.9388, "facility_types": 0.9568, "maturity_date": 1.0, "benchmark_rate": 1.0, "governing_law": 0.9592}, "best": {"borrower_name": 0.9388, "administrative_agent": 0.9796, "agreement_date": 0.9592, "total_facility_size_usd": 0.6327, "facility_types": 0.8985, "maturity_date": 0.898, "benchmark_rate": 0.9388, "governing_law": 0.9796}, "best_label": "Llama-3.1-8B \u2014 tuned"}};
+
+/* ===================== site sections ===================== */
+(function(){
+  const $ = id => document.getElementById(id);
+  const F = DATA.fields, C = DATA.content;
+  const pct = v => (v*100).toFixed(1)+"%";
+  const fmtV = v => v==null ? "—" : Array.isArray(v) ? (v.length? v.join(", ") : "—")
+    : typeof v === "number" ? "$"+v.toLocaleString("en-US") : String(v);
+
+  /* TLDR */
+  $("roleName").textContent = C.tldr.role;
+  $("tldrLine").textContent = C.tldr.line1;
+  $("tldrList").innerHTML = C.tldr.bullets.map(b=>`<li>${b}</li>`).join("");
+
+  /* scoreboard: base vs tuned side by side per family */
+  const fr = DATA.frontier;
+  const cellHTML = c => c ? `<td class="acc">${pct(c.acc)}</td><td>$${c.cost.toFixed(2)}</td><td>${c.lat.toFixed(1)}s</td>`
+                          : `<td colspan="3" style="color:var(--muted)">tuned for $27 — serving needs a 16×H100 cluster (see DevEx note #1)</td>`;
+  let h = `<thead>
+    <tr><th rowspan="2" style="vertical-align:bottom">Open model<br><span class="lat" style="font-weight:400">${DATA.n_test} held-out docs</span></th>
+        <th colspan="3" style="text-align:center;border-bottom:none;color:var(--s2)">Base — off the shelf</th>
+        <th colspan="3" style="text-align:center;border-bottom:none;color:var(--s1)">Tuned on Fireworks</th>
+        <th rowspan="2" style="vertical-align:bottom">Δ acc</th></tr>
+    <tr><th>Accuracy</th><th>$/1K docs</th><th>p50</th><th>Accuracy</th><th>$/1K docs</th><th>p50</th></tr></thead><tbody>`;
+  for(const f of DATA.families){
+    if(!f.base && !f.tuned) continue;
+    const delta = (f.base && f.tuned) ? ((f.tuned.acc - f.base.acc)*100) : null;
+    h += `<tr class="${f.ours?'ours':''}"><td>${f.label}${f.ours?`<span class="tag">OURS</span>`:""}<span class="sub">${f.sub}</span></td>
+      ${f.base?cellHTML(f.base):`<td colspan="3" style="color:var(--muted)">—</td>`}
+      ${cellHTML(f.tuned)}
+      <td style="font-weight:650;color:${delta==null?'var(--muted)':(delta>=0?'var(--good)':'var(--bad)')}">${delta==null?"…":(delta>=0?"+":"")+delta.toFixed(1)}</td></tr>`;
+  }
+  if(fr){
+    h += `<tr><td colspan="8" style="padding-top:14px;color:var(--ink-2);font-size:13.5px;border-bottom:none">
+      <b>The benchmark to beat:</b> GPT-5.6-sol, rented as-is — <b>${pct(fr.acc)}</b> accuracy · <b>$${fr.cost.toFixed(2)}</b> per 1K docs · <b>${fr.lat.toFixed(1)}s</b> median. Not tunable, not ownable.</td></tr>`;
+  }
+  $("scoreTable").innerHTML = h + "</tbody>";
+  $("scoreNote").innerHTML = `Honest caveats: the gold labels were drafted by GPT-5.6-sol, independently audited field-by-field
+    by a second model family (396/400 confirmed, 2 corrected), and every contested call human-adjudicated — three of five rulings
+    went <i>against</i> the frontier's drafts. Where drafter and auditor share a blind spot, the frontier column still carries some
+    self-agreement bias: read it as a ceiling. 8B costs are serverless-rate equivalents; on a dedicated H100 the tuned 8B sustained
+    ~6K docs/hour ≈ $1.33 per 1K docs at utilization.`;
+  if(DATA.bars.best_label){
+    $("fieldbars").innerHTML = `<div style="grid-column:1/-1;font-size:12px;color:var(--muted)">
+      Per-field accuracy — <span class="sw" style="width:9px;height:9px;background:var(--s1)"></span>${DATA.bars.best_label}
+      vs <span class="sw" style="width:9px;height:9px;background:var(--s2)"></span>GPT-5.6-sol</div>` + F.map(fl=>{
+      const tv=(DATA.bars.best[fl]||0)*100, fv=(DATA.bars.frontier[fl]||0)*100;
+      return `<div class="fb"><span>${fl}</span><span>${tv.toFixed(0)}% vs ${fv.toFixed(0)}%</span>
+        <span class="bar"><i class="f" style="width:${fv}%"></i></span>
+        <span class="bar"><i style="width:${tv}%"></i></span></div>`;
+    }).join("");
+  }
+
+  /* story steps */
+  $("steps").innerHTML = C.story_steps.map(s=>
+    `<div class="step"><div class="num">${s.n}</div><div><h3>${s.t}</h3><p>${s.d}</p></div><div class="meta">${s.meta}</div></div>`).join("");
+
+  /* sample explorer */
+  let cur = 0;
+  function renderSample(){
+    const s = DATA.samples[cur];
+    document.querySelectorAll("#sampleChips .chip").forEach((c,i)=>c.setAttribute("aria-pressed", i===cur?"true":"false"));
+    const cols = [{name:"Gold (adjudicated)", pred:s.gold, lat:null}, ...s.models.map(m=>({name:m.name,pred:m.pred,lat:m.lat}))];
+    let t = `<thead><tr><th>field</th>${cols.map(c=>`<th>${c.name}${c.lat?` <span class="lat">${c.lat}s</span>`:""}</th>`).join("")}</tr></thead><tbody>`;
+    for(const fl of F){
+      t += `<tr><td style="color:var(--muted)">${fl}</td>`;
+      const gold = s.gold[fl];
+      cols.forEach((c,ci)=>{
+        if(c.pred==null && ci>0){ t+=`<td class="v"><span class="no">✗</span> <span class="lat">no valid JSON</span></td>`; return; }
+        const v = c.pred[fl];
+        if(ci===0){ t += `<td class="v">${fmtV(v)}</td>`; return; }
+        const hit = JSON.stringify(v)===JSON.stringify(gold) ||
+          (v!=null&&gold!=null&&String(v).toLowerCase().replace(/[^a-z0-9]/g,"")===String(gold).toLowerCase().replace(/[^a-z0-9]/g,""));
+        t += `<td class="v"><span class="${hit?"ok":"no"}">${hit?"✓":"✗"}</span> ${fmtV(v)}</td>`;
+      });
+      t += "</tr>";
+    }
+    $("cmpTable").innerHTML = t+"</tbody>";
+    $("srcLink").innerHTML = `Source: <a href="${s.url}" target="_blank" rel="noopener">${s.company} — SEC filing, ${s.date}</a>.
+      ✓/✗ is a simplified match for display; the eval uses field-appropriate scoring (fuzzy names, normalized dates/amounts, set-F1 for facility types).`;
+  }
+  $("sampleChips").innerHTML = DATA.samples.map((s,i)=>
+    `<button class="chip" aria-pressed="${i===0}" data-i="${i}">${s.company.replace(/\s*\(.*$/,"")}</button>`).join("");
+  document.querySelectorAll("#sampleChips .chip").forEach(b=>b.onclick=()=>{cur=+b.dataset.i;renderSample()});
+  renderSample();
+
+  /* method, devex, gtm, about */
+  $("method").innerHTML = `~290 executed credit agreements pulled from SEC EDGAR (2019–2026, one per company, amendments excluded),
+    trimmed to definition-bearing excerpts. Training labels drafted by GPT-5.6-sol; the test set was independently audited
+    field-by-field by a second model family (Claude), with judgment calls adjudicated by hand — one document was excluded when the
+    audit revealed it was an intercreditor agreement (final n=${DATA.n_test}). 238 examples fine-tuned each open model via LoRA on
+    Fireworks (rank 16, 2 epochs). Same prompt, same excerpts, same scorer for every model: fuzzy match for names, normalized dates
+    and amounts, set-F1 for facility types, and null-discipline enforced — abstaining when the excerpt is silent is correct, guessing
+    is not. The Qwen3-8B pair tests whether a newer base beats task fit — it doesn't: Qwen starts 13 points ahead of Llama
+    off the shelf yet gains only +2.8 from the identical recipe that moved Llama +23.4. One command per stage; reruns
+    from scratch.`;
+  const notes = [...C.devex_notes, C.devex_note_4].filter(Boolean);
+  $("devex").innerHTML = notes.map(n=>
+    `<div class="card"><h3>${n.title}</h3><p>${n.body}</p><p class="fix">${n.fix}</p></div>`).join("");
+  $("gtmHead").textContent = C.gtm_wedge.headline;
+  $("gtmBody").textContent = C.gtm_wedge.body;
+  $("gtmTargets").textContent = C.gtm_wedge.targets;
+  $("about").textContent = C.about;
+  $("mailto").href = "mailto:"+C.links.email; $("cta").href = "mailto:"+C.links.email;
+  if(C.links.linkedin){ $("liWrap").hidden=false; const l=$("liLink"); l.hidden=false; l.href=C.links.linkedin; }
+  $("stamp").textContent = "Built August 2026.";
+})();
+
+/* ===================== calculator ===================== */
+(function(){
+  const $ = id => document.getElementById(id);
+  const FRONTIER = [
+    {id:"gpt-5.6-sol",  name:"GPT-5.6-sol ($5 / $30 per 1M)",   pin:5.00, pout:30.00},
+    {id:"gpt-5.6-terra",name:"GPT-5.6-terra ($2 / $12 per 1M)", pin:2.00, pout:12.00},
+    {id:"gpt-5.6-luna", name:"GPT-5.6-luna ($0.20 / $1.20 per 1M)", pin:0.20, pout:1.20},
+  ];
+  const OWNED = [
+    {id:"fw-8b", name:"Fireworks 8B, serverless-rate ($0.20 / $0.20 per 1M)", pin:0.20, pout:0.20},
+  ];
+  const PRESETS = [
+    {name:"Credit-doc extraction (measured)", vol:100000, tin:8750, tout:100, frontier:"gpt-5.6-sol",
+     upfront:30, note:"Measured on the fine-tune above: $30 all-in to specialize (labeling + $2 LoRA training + eval). Accuracy table at the top of this page."},
+    {name:"Support macro-drafting", vol:250000, tin:1800, tout:350, frontier:"gpt-5.6-terra", upfront:2500,
+     note:"Illustrative workload; upfront includes labeling + a few tuning iterations."},
+    {name:"Contract clause triage", vol:40000, tin:9000, tout:150, frontier:"gpt-5.6-sol", upfront:2500,
+     note:"Illustrative workload; upfront includes labeling + a few tuning iterations."},
+    {name:"Custom", vol:100000, tin:2000, tout:300, frontier:"gpt-5.6-sol", upfront:1000, note:""},
+  ];
+  const fmt$ = v => v >= 1e6 ? "$"+(v/1e6).toFixed(2)+"M" : v >= 1e4 ? "$"+Math.round(v/1e3)+"K"
+              : v >= 1000 ? "$"+v.toLocaleString("en-US",{maximumFractionDigits:0})
+              : "$"+v.toLocaleString("en-US",{maximumFractionDigits: v<10?2:0});
+  const fmtN = v => v >= 1e6 ? (v/1e6).toFixed(v<3e6?1:0)+"M" : v >= 1e3 ? Math.round(v/1e3)+"K" : String(Math.round(v));
+  const volFromSlider = s => Math.round(Math.pow(10, 3 + (s/1000)*4));
+  const sliderFromVol = v => Math.round((Math.log10(Math.max(1e3,Math.min(1e7,v)))-3)/4*1000);
+
+  function state(){
+    const f = FRONTIER.find(x=>x.id===$("frontierSel").value) || FRONTIER[0];
+    const o = OWNED.find(x=>x.id===$("ownedSel").value) || OWNED[0];
+    return { vol: volFromSlider(+$("vol").value), tin:+$("tin").value||0, tout:+$("tout").value||0,
+             f, o, upfront:+$("upfront").value||0 };
+  }
+  const perReq = (s,m) => (s.tin*m.pin + s.tout*m.pout)/1e6;
+
+  function render(){
+    const s = state();
+    $("volLbl").textContent = fmtN(s.vol);
+    const rentMo = s.vol*perReq(s,s.f), ownMo = s.vol*perReq(s,s.o);
+    const delta = rentMo-ownMo;
+    const beMonths = delta>0 ? s.upfront/delta : null;
+    const yearSave = delta*12 - s.upfront;
+    $("tRent").textContent = fmt$(rentMo);
+    $("tRentD").textContent = s.f.name.split(" (")[0]+" · "+fmt$(perReq(s,s.f)*1000)+" per 1K requests";
+    $("tOwn").textContent = fmt$(ownMo);
+    $("tOwnD").textContent = "tuned open model · "+fmt$(perReq(s,s.o)*1000)+" per 1K requests + "+fmt$(s.upfront)+" one-time";
+    $("tBE").textContent = beMonths==null ? "—" : beMonths<=1/30 ? "<1 day"
+        : beMonths<1 ? (d=>d+(d===1?" day":" days"))(Math.max(1,Math.round(beMonths*30.44))) : beMonths.toFixed(1)+" months";
+    $("tBED").textContent = beMonths==null ? "owned isn't cheaper at these prices" : "one-time cost recovered at current volume";
+    $("tSave").textContent = (yearSave>=0?"":"−")+fmt$(Math.abs(yearSave));
+    $("tSaveD").textContent = ownMo>0&&rentMo>0 ? (rentMo/ownMo).toFixed(1)+"× cheaper per request once tuned" : "";
+    drawChart(rentMo, ownMo, s.upfront, beMonths);
+    drawTable(rentMo, ownMo, s.upfront);
+    $("calcFoot").textContent = "Pricing: OpenAI + Fireworks public list rates, August 2026 — cumulative-cost view, list pricing, no volume discounts. Measured preset parameters come from the experiment above.";
+  }
+
+  function drawChart(rentMo, ownMo, upfront, beMonths){
+    const svg = $("chart"), W = svg.clientWidth || 900, H = 360,
+          M = {t:18, r:170, b:34, l:64}, IW = W-M.l-M.r, IH = H-M.t-M.b;
+    const maxY = Math.max(rentMo*12, upfront+ownMo*12)*1.06 || 1;
+    const x = m => M.l + m/12*IW, y = v => M.t + IH - v/maxY*IH;
+    const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+    const s1 = css("--s1"), s2 = css("--s2");
+    let g = "";
+    for(let i=0;i<=4;i++){
+      const v = maxY*i/4, yy = y(v);
+      g += `<line x1="${M.l}" y1="${yy}" x2="${M.l+IW}" y2="${yy}" stroke="var(--grid)" stroke-width="1"/>`
+         + `<text x="${M.l-8}" y="${yy+4}" text-anchor="end">${fmt$(v)}</text>`;
+    }
+    for(let m=0;m<=12;m+=3)
+      g += `<text x="${x(m)}" y="${H-10}" text-anchor="middle">${m===0?"start":m+" mo"}</text>`;
+    g += `<line x1="${M.l}" y1="${y(0)}" x2="${M.l+IW}" y2="${y(0)}" stroke="var(--baseline)" stroke-width="1"/>`;
+    const pts = f => Array.from({length:13},(_,m)=>`${x(m)},${y(f(m))}`).join(" ");
+    g += `<polyline points="${pts(m=>rentMo*m)}" fill="none" stroke="${s2}" stroke-width="2" stroke-linecap="round"/>`;
+    g += `<polyline points="${pts(m=>upfront+ownMo*m)}" fill="none" stroke="${s1}" stroke-width="2" stroke-linecap="round"/>`;
+    g += `<text class="dl" x="${x(12)+8}" y="${y(rentMo*12)+4}" fill="var(--ink-1)">Renting</text>`;
+    g += `<text class="dl" x="${x(12)+8}" y="${y(upfront+ownMo*12)+(Math.abs(y(rentMo*12)-y(upfront+ownMo*12))<18?16:4)}" fill="var(--ink-1)">Owning</text>`;
+    if(beMonths!=null && beMonths<=12){
+      const bx = x(beMonths), by = y(rentMo*beMonths);
+      g += `<line x1="${bx}" y1="${by}" x2="${bx}" y2="${y(0)}" stroke="var(--baseline)" stroke-width="1" stroke-dasharray="3 4"/>`
+         + `<circle cx="${bx}" cy="${by}" r="5" fill="var(--surface-1)" stroke="var(--ink-1)" stroke-width="2"/>`
+         + `<text class="be-label" x="${bx+9}" y="${by-9}">breakeven ${beMonths<1?(d=>d+(d===1?" day":" days"))(Math.max(1,Math.round(beMonths*30.44))):beMonths.toFixed(1)+" mo"}</text>`;
+    }
+    g += `<line id="xh" x1="0" y1="${M.t}" x2="0" y2="${y(0)}" stroke="var(--baseline)" stroke-width="1" visibility="hidden"/>`
+       + `<circle id="xhr" r="4" fill="${s2}" stroke="var(--surface-1)" stroke-width="2" visibility="hidden"/>`
+       + `<circle id="xho" r="4" fill="${s1}" stroke="var(--surface-1)" stroke-width="2" visibility="hidden"/>`
+       + `<rect id="hit" x="${M.l}" y="${M.t}" width="${IW}" height="${IH}" fill="transparent"/>`;
+    svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+    svg.innerHTML = g;
+    const tip = $("tooltip");
+    $("hit").onmousemove = ev => {
+      const r = svg.getBoundingClientRect(), mx = (ev.clientX-r.left)*(W/r.width);
+      const m = Math.min(12, Math.max(0,(mx-M.l)/IW*12)), ms = Math.round(m*4)/4;
+      const rc = rentMo*ms, oc = upfront+ownMo*ms, xx = x(ms);
+      $("xh").setAttribute("x1",xx); $("xh").setAttribute("x2",xx); $("xh").setAttribute("visibility","visible");
+      $("xhr").setAttribute("cx",xx); $("xhr").setAttribute("cy",y(rc)); $("xhr").setAttribute("visibility","visible");
+      $("xho").setAttribute("cx",xx); $("xho").setAttribute("cy",y(oc)); $("xho").setAttribute("visibility","visible");
+      tip.style.display="block";
+      tip.style.left = Math.min(window.innerWidth-190, ev.clientX+14)+"px";
+      tip.style.top = (ev.clientY+12)+"px";
+      tip.innerHTML = `<div class="t">${ms===0?"start":"month "+ms}</div>
+        <div><span class="sw" style="background:${s2}"></span>Renting&nbsp; <b>${fmt$(rc)}</b></div>
+        <div><span class="sw" style="background:${s1}"></span>Owning&nbsp; <b>${fmt$(oc)}</b></div>
+        <div class="t" style="margin-top:3px">${rc>oc?"owning ahead by "+fmt$(rc-oc):"renting ahead by "+fmt$(oc-rc)}</div>`;
+    };
+    $("hit").onmouseleave = () => { tip.style.display="none";
+      for(const id of ["xh","xhr","xho"]) $(id).setAttribute("visibility","hidden"); };
+  }
+
+  function drawTable(rentMo, ownMo, upfront){
+    let rows = "";
+    for(let m=1;m<=12;m++){
+      const rc=rentMo*m, oc=upfront+ownMo*m;
+      rows += `<tr><td>Month ${m}</td><td class="v">${fmt$(rc)}</td><td class="v">${fmt$(oc)}</td>
+        <td class="v" style="color:${rc>=oc?"var(--good)":"var(--ink-2)"}">${rc>=oc?fmt$(rc-oc):"−"+fmt$(oc-rc)}</td></tr>`;
+    }
+    $("tblWrap").innerHTML = `<table class="cmp"><thead><tr><th>Cumulative</th><th>Renting</th><th>Owning</th><th>Owning saves</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function applyPreset(p, btn){
+    $("vol").value = sliderFromVol(p.vol); $("tin").value = p.tin; $("tout").value = p.tout;
+    $("frontierSel").value = p.frontier; $("upfront").value = p.upfront;
+    document.querySelectorAll("#calcPresets .chip").forEach(c=>c.setAttribute("aria-pressed", c===btn ? "true":"false"));
+    render();
+  }
+  $("frontierSel").innerHTML = FRONTIER.map(f=>`<option value="${f.id}">${f.name}</option>`).join("");
+  $("ownedSel").innerHTML = OWNED.map(o=>`<option value="${o.id}">${o.name}</option>`).join("");
+  const wrap = $("calcPresets");
+  PRESETS.forEach((p,i)=>{
+    const b = document.createElement("button");
+    b.className="chip"; b.textContent=p.name; b.setAttribute("aria-pressed", i===0?"true":"false");
+    b.title = p.note; b.onclick = ()=>applyPreset(p,b);
+    wrap.appendChild(b);
+  });
+  for(const id of ["vol","tin","tout","frontierSel","ownedSel","upfront"])
+    $(id).addEventListener("input", ()=>{
+      document.querySelectorAll("#calcPresets .chip").forEach(c=>c.setAttribute("aria-pressed","false"));
+      document.querySelectorAll("#calcPresets .chip")[3].setAttribute("aria-pressed","true");
+      render();
+    });
+  $("tblBtn").onclick = ()=>{ const w=$("tblWrap"); w.hidden=!w.hidden;
+    $("tblBtn").textContent = w.hidden?"View as table":"Hide table";
+    $("tblBtn").setAttribute("aria-expanded", String(!w.hidden)); };
+  applyPreset(PRESETS[0], document.querySelector("#calcPresets .chip"));
+  addEventListener("resize", render);
+})();
+</script>
+</body>
+</html>
